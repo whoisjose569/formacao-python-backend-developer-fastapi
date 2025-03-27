@@ -5,6 +5,7 @@ from src.security import login_required
 from src.services.post import PostService
 from src.views.post import PostOut
 
+
 router = APIRouter(prefix="/posts", dependencies=[Depends(login_required)])
 
 service = PostService()

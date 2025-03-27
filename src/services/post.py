@@ -1,5 +1,5 @@
 from databases.interfaces import Record
-
+from src.exceptions import NotFoudPostError
 from src.database import database
 from src.models.post import posts
 from src.schemas.post import PostIn, PostUpdate
@@ -32,6 +32,8 @@ class PostService:
     async def update(self, id: int, post: PostUpdate) -> Record:
         total = await self.count(id)
 
+        if not total:
+            raise NotFoudPostError()
         data = post.model_dump(exclude_unset=True)
         command = posts.update().where(posts.c.id == id).values(**data)
         await database.execute(command)
@@ -50,4 +52,6 @@ class PostService:
     async def __get_by_id(self, id: int) -> Record:
         query = posts.select().where(posts.c.id == id)
         post = await database.fetch_one(query)
+        if not post:
+            raise NotFoudPostError()
         return post
